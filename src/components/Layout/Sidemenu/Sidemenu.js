@@ -12,7 +12,7 @@ const SideMenu = props => {
   return (
     <Menu mode="inline" style={{ textAlign: "left" }}>
       <Menu.SubMenu
-        key="sub1"
+        key="0"
         title={
           <span>
             <Icon type="mail" />
@@ -37,10 +37,10 @@ const SideMenu = props => {
             </span>
           }
         >
-          <Menu.Item key="1" disabled={user.mySpot ? false : true}>
+          <Menu.Item key={`sub${key}`} disabled={user.mySpot ? false : true}>
             Spot
           </Menu.Item>
-          <Menu.Item key="2">Telefono</Menu.Item>
+          <Menu.Item key={`sub${key + 1}`}>Telefono</Menu.Item>
         </Menu.SubMenu>
       ))}
     </Menu>

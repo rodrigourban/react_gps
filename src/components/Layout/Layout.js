@@ -4,10 +4,16 @@ import { Avatar, Button } from "antd";
 import Map from "./Map/Map";
 import SideMenu from "./Sidemenu/Sidemenu";
 import axios from "axios";
+import { Modal } from "antd";
+import AddPerson from "../Modal/Forms/AddPerson";
+import EditPerson from "../Modal/Forms/EditPerson";
 class Layout extends React.Component {
   state = {
     puntos: [],
-    showing: null
+    showing: null,
+    modal: false,
+    modalId: null,
+    userList: []
   };
 
   toggleShowedElement = n => {
@@ -15,7 +21,29 @@ class Layout extends React.Component {
     this.fetchPoints(n);
   };
 
+  toggleModal = n => {
+    if (n) {
+      this.setState({ modal: !this.state.modal, modalId: n });
+    }
+    this.setState({ modal: !this.state.modal });
+  };
+
+  addElement = el => {
+    const newUserList = [...this.state.userList];
+    newUserList.push({ username: el.spot });
+    this.setState({ userList: newUserList });
+    this.toggleModal();
+  };
+
+  editElement = el => {
+    this.setState({ spot: el.spot });
+    this.toggleModal();
+  };
+
   componentDidMount() {
+    this.setState({
+      userList: [{ username: "Ismael" }]
+    });
     const db = firebase.firestore();
     db.collection("points")
       .where("userId", "==", firebase.auth().currentUser.uid)
@@ -60,6 +88,20 @@ class Layout extends React.Component {
   render() {
     return (
       <div style={{ display: "flex", height: "100%" }}>
+        <Modal
+          title={
+            this.state.modalId === 1 ? "Editar información" : "Agregar persona"
+          }
+          visible={this.state.modal}
+          onCancel={() => this.toggleModal(0)}
+          footer={null}
+        >
+          {this.state.modalId === 1 ? (
+            <EditPerson spot={this.state.spot} onSubmit={this.editElement} />
+          ) : (
+            <AddPerson onSubmit={this.addElement} />
+          )}
+        </Modal>
         <div
           style={{
             flex: "20%",
@@ -77,18 +119,23 @@ class Layout extends React.Component {
             />
             <h1>Bienvenido</h1>
             <div style={{ marginBottom: "1rem" }}>
-              {firebase.auth().currentUser.displayName}
+              {firebase.auth().currentUser.displayName}{" "}
+              <Button
+                onClick={() => this.toggleModal(1)}
+                shape="circle"
+                icon="edit"
+              />
             </div>
           </div>
           <div style={{ padding: "15px", background: "#ccc", flex: "1" }}>
             <SideMenu
-              userList={[{ username: "Ismael" }]}
+              userList={this.state.userList}
               onToggle={this.toggleShowedElement}
             />
           </div>
           <div>
-            <Button onClick={() => console.log("Creando")} block type="primary">
-              Cargar Nuevo
+            <Button onClick={() => this.toggleModal(2)} type="primary" block>
+              Agregar persona
             </Button>
             <Button onClick={() => firebase.auth().signOut()} block>
               Salir
