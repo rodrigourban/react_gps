@@ -8,6 +8,7 @@ const AddPerson = props => {
   const [loading, setLoading] = React.useState(false);
   const [error, setError] = React.useState(null);
   const { getFieldDecorator } = props.form;
+
   const handleSubmit = e => {
     e.preventDefault();
     setLoading(true);
@@ -34,7 +35,10 @@ const AddPerson = props => {
                       ...oldUserList,
                       {
                         username: res.docs[0].data().username,
-                        email: res.docs[0].data().email
+                        email: res.docs[0].data().email,
+                        userId: res.docs[0].id,
+                        color: res.docs[0].data().color,
+                        spotId: res.docs[0].data().spotId
                       }
                     ]
                   });
@@ -56,6 +60,8 @@ const AddPerson = props => {
       .then(res => {
         if (res.data().userList) {
           setOldUserList(res.data().userList);
+        } else {
+          setOldUserList([]);
         }
       });
   });
