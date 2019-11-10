@@ -146,7 +146,7 @@ class Layout extends React.Component {
           >
             <SideMenu
               userList={this.state.userList ? this.state.userList : []}
-              onToggle={this.toggleShowedElement}
+              onToggle={this.fetchPoints}
             />
           </div>
           <div>

@@ -8,6 +8,9 @@ import {
 } from "react-google-maps";
 
 const Map = props => {
+  const generateColor = () => {
+    return "#" + Math.floor(Math.random() * 16777215).toString(16);
+  };
   return (
     <GoogleMap
       defaultZoom={14}
@@ -17,7 +20,7 @@ const Map = props => {
         path={props.snake}
         geodesic={true}
         options={{
-          strokeColor: "#ff2527",
+          strokeColor: generateColor(),
           strokeOpacity: 0.75,
           strokeWeight: 2,
           icons: [
