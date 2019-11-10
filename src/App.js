@@ -24,7 +24,7 @@ class App extends React.Component {
     signInFlow: "popup",
     signInOptions: [firebase.auth.GoogleAuthProvider.PROVIDER_ID],
     callbacks: {
-      signInSuccess: () => console.log("gay")
+      signInSuccess: () => false
     }
   };
 

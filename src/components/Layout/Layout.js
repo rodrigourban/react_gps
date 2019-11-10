@@ -19,15 +19,11 @@ class Layout extends React.Component {
     db: firebase.firestore()
   };
 
-  toggleShowedElement = n => {
-    this.setState({ showing: n });
-    this.fetchPoints(n);
-  };
-
   toggleModal = n => {
     if (n) {
       this.setState({ modal: !this.state.modal, modalId: n });
     }
+    this.getUser();
     this.setState({ modal: !this.state.modal });
   };
 
@@ -36,17 +32,23 @@ class Layout extends React.Component {
     this.toggleModal();
   };
 
-  componentDidMount() {
+  getUser = () => {
     this.state.db
       .collection("users")
       .doc(firebase.auth().currentUser.uid)
       .get()
       .then(res => {
-        this.setState({
-          userList: res.data().userList,
-          spotId: res.data().spotId
-        });
+        if (!res.empty) {
+          this.setState({
+            userList: res.data().userList,
+            spotId: res.data().spotId
+          });
+        }
       });
+  };
+
+  componentDidMount() {
+    this.getUser();
   }
 
   fetchPoints = n => {
@@ -63,7 +65,6 @@ class Layout extends React.Component {
             lng: element.longitude
           }));
           this.setState({ puntos: points });
-          this.forceUpdate();
         })
         .catch(error => {
           console.log(error);
@@ -104,7 +105,10 @@ class Layout extends React.Component {
               userId={firebase.auth().currentUser.uid}
             />
           ) : (
-            <AddPerson onSubmit={this.addElement} />
+            <AddPerson
+              toggleModal={this.toggleModal}
+              userId={firebase.auth().currentUser.uid}
+            />
           )}
         </Modal>
         <div
@@ -141,7 +145,7 @@ class Layout extends React.Component {
             }}
           >
             <SideMenu
-              userList={this.state.userList}
+              userList={this.state.userList ? this.state.userList : []}
               onToggle={this.toggleShowedElement}
             />
           </div>

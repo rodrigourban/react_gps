@@ -4,6 +4,7 @@ import firebase from "firebase";
 
 const AddPerson = props => {
   const db = firebase.firestore();
+  const [oldUserList, setOldUserList] = React.useState([]);
   const [loading, setLoading] = React.useState(false);
   const [error, setError] = React.useState(null);
   const { getFieldDecorator } = props.form;
@@ -21,7 +22,24 @@ const AddPerson = props => {
             if (res.empty) {
               setError(true);
             } else {
-              console.log(res.docs[0].data());
+              if (
+                !oldUserList.find(
+                  element => element.username === res.docs[0].data().username
+                )
+              ) {
+                db.collection("users")
+                  .doc(props.userId)
+                  .update({
+                    userList: [
+                      ...oldUserList,
+                      {
+                        username: res.docs[0].data().username,
+                        email: res.docs[0].data().email
+                      }
+                    ]
+                  });
+              }
+              props.toggleModal();
             }
           })
           .catch(error => {
@@ -30,6 +48,17 @@ const AddPerson = props => {
       }
     });
   };
+
+  React.useEffect(() => {
+    db.collection("users")
+      .doc(props.userId)
+      .get()
+      .then(res => {
+        if (res.data().userList) {
+          setOldUserList(res.data().userList);
+        }
+      });
+  });
 
   const errorMessage = error
     ? {
