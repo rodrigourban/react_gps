@@ -7,7 +7,7 @@ import Layout from "./components/Layout/Layout";
 
 firebase.initializeApp({
   apiKey: "AIzaSyCsHPGB0Zmv3468gMFuk4dbKmuXoacid0U",
-  authDomain: "my-gps-94a6c.firebaseapp.com",
+  authDomain: "my-gps-94a6c.web.app",
   databaseURL: "https://my-gps-94a6c.firebaseio.com",
   projectId: "my-gps-94a6c",
   storageBucket: "my-gps-94a6c.appspot.com",
@@ -24,15 +24,8 @@ class App extends React.Component {
     signInFlow: "popup",
     signInOptions: [firebase.auth.GoogleAuthProvider.PROVIDER_ID],
     callbacks: {
-      signInSuccess: () => false
+      signInSuccess: () => console.log("gay")
     }
-  };
-
-  add = () => {
-    const userRef = this.state.db.collection("ismaeltrolo").add({
-      trolo: true,
-      si: "Esto es como no relacional no?"
-    });
   };
 
   componentDidMount = () => {
@@ -70,7 +63,7 @@ class App extends React.Component {
             />
           </div>
         ) : (
-          <Layout spotID={"0E4zAQbexpbFvzlYljYGlXyzlJTmLIi3I"} />
+          <Layout />
         )}
       </div>
     );

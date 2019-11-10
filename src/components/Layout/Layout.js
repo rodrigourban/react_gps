@@ -7,13 +7,16 @@ import axios from "axios";
 import { Modal } from "antd";
 import AddPerson from "../Modal/Forms/AddPerson";
 import EditPerson from "../Modal/Forms/EditPerson";
+import "./scrollbar.css";
+
 class Layout extends React.Component {
   state = {
     puntos: [],
     showing: null,
     modal: false,
     modalId: null,
-    userList: []
+    userList: [],
+    db: firebase.firestore()
   };
 
   toggleShowedElement = n => {
@@ -28,37 +31,21 @@ class Layout extends React.Component {
     this.setState({ modal: !this.state.modal });
   };
 
-  addElement = el => {
-    const newUserList = [...this.state.userList];
-    newUserList.push({ username: el.spot });
-    this.setState({ userList: newUserList });
-    this.toggleModal();
-  };
-
   editElement = el => {
     this.setState({ spot: el.spot });
     this.toggleModal();
   };
 
   componentDidMount() {
-    this.setState({
-      userList: [{ username: "Ismael" }]
-    });
-    const db = firebase.firestore();
-    db.collection("points")
-      .where("userId", "==", firebase.auth().currentUser.uid)
+    this.state.db
+      .collection("users")
+      .doc(firebase.auth().currentUser.uid)
       .get()
-      .then(querySnapshot => {
-        let contenido = [];
-        querySnapshot.forEach(doc => {
-          contenido.push({
-            lat: doc.data().point.latitude,
-            lng: doc.data().point.longitude
-          });
+      .then(res => {
+        this.setState({
+          userList: res.data().userList,
+          spotId: res.data().spotId
         });
-        console.log(contenido);
-
-        this.setState({ puntos: contenido });
       });
   }
 
@@ -66,7 +53,7 @@ class Layout extends React.Component {
     if (n === 0) {
       axios
         .get(
-          `https://api.findmespot.com/spot-main-web/consumer/rest-api/2.0/public/feed/${this.props.spotID}/message.json`
+          `https://api.findmespot.com/spot-main-web/consumer/rest-api/2.0/public/feed/${this.state.spotId}/message.json`
         )
         .then(res => {
           const messages =
@@ -76,15 +63,30 @@ class Layout extends React.Component {
             lng: element.longitude
           }));
           this.setState({ puntos: points });
+          this.forceUpdate();
         })
         .catch(error => {
           console.log(error);
         });
     } else {
-      this.setState({ puntos: [] });
-      console.log("Buscar en firebase");
+      this.state.db
+        .collection("points")
+        .where("userId", "==", firebase.auth().currentUser.uid)
+        .get()
+        .then(querySnapshot => {
+          let contenido = [];
+          querySnapshot.forEach(doc => {
+            contenido.push({
+              lat: doc.data().point.latitude,
+              lng: doc.data().point.longitude
+            });
+          });
+
+          this.setState({ puntos: contenido });
+        });
     }
   };
+
   render() {
     return (
       <div style={{ display: "flex", height: "100%" }}>
@@ -97,7 +99,10 @@ class Layout extends React.Component {
           footer={null}
         >
           {this.state.modalId === 1 ? (
-            <EditPerson spot={this.state.spot} onSubmit={this.editElement} />
+            <EditPerson
+              toggleModal={this.toggleModal}
+              userId={firebase.auth().currentUser.uid}
+            />
           ) : (
             <AddPerson onSubmit={this.addElement} />
           )}
@@ -127,7 +132,14 @@ class Layout extends React.Component {
               />
             </div>
           </div>
-          <div style={{ padding: "15px", background: "#ccc", flex: "1" }}>
+          <div
+            style={{
+              padding: "15px",
+              background: "#ccc",
+              flex: "1",
+              overflowY: "auto"
+            }}
+          >
             <SideMenu
               userList={this.state.userList}
               onToggle={this.toggleShowedElement}
