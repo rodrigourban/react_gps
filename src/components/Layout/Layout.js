@@ -111,6 +111,7 @@ class Layout extends React.Component {
         this.state.db
           .collection("points")
           .where("userId", "==", payload.userId)
+          .orderBy("timestamp", "asc")
           .get()
           .then(querySnapshot => {
             let contenido = [];

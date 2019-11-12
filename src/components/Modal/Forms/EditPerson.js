@@ -12,7 +12,7 @@ const EditPerson = props => {
       if (!err) {
         db.collection("users")
           .doc(props.userId)
-          .set({
+          .update({
             spotId: values.spot
           })
           .catch(function(error) {
