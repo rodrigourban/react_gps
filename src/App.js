@@ -5,15 +5,6 @@ import { Typography } from "antd";
 import logo from "./assets/logazo.png";
 import Layout from "./components/Layout/Layout";
 
-firebase.initializeApp({
-  apiKey: "AIzaSyCsHPGB0Zmv3468gMFuk4dbKmuXoacid0U",
-  authDomain: "my-gps-94a6c.web.app",
-  databaseURL: "https://my-gps-94a6c.firebaseio.com",
-  projectId: "my-gps-94a6c",
-  storageBucket: "my-gps-94a6c.appspot.com",
-  messagingSenderId: "720146341436",
-  appId: "1:720146341436:web:0ad186d8ee073c47baad39"
-});
 
 class App extends React.Component {
   state = {
